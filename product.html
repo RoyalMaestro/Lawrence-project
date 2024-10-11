@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Products</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Simple cart management
+        let cart = [];
+        let loggedInUser = null;
+        let transactions = {}; // Object to store user transactions
+
+        function register() {
+            const username = prompt("Enter a username to register:");
+            if (username) {
+                alert(`User ${username} registered successfully! Please log in to continue.`);
+            }
+        }
+
+        function login() {
+            const username = prompt("Enter your username to log in:");
+            if (username) {
+                loggedInUser = username;
+                // Initialize transaction history for the user if not already done
+                if (!transactions[username]) {
+                    transactions[username] = [];
+                }
+                alert(`Welcome back, ${loggedInUser}! You can now add items to your cart.`);
+            }
+        }
+
+        function addToCart(productName, price) {
+            if (!loggedInUser) {
+                alert("You need to register or log in before adding items to the cart.");
+                return;
+            }
+            cart.push({ name: productName, price: price });
+            alert(`${productName} has been added to your cart!`);
+            displayTotal();
+            console.log(cart); // For debugging
+        }
+
+        function displayTotal() {
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            alert(`Total amount in your cart: Ksh.${total}`);
+        }
+
+        function viewCart() {
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+
+            let cartItems = "Items in your cart:\n";
+            cart.forEach(item => {
+                cartItems += `${item.name} - Ksh.${item.price}\n`;
+            });
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            cartItems += `\nTotal: Ksh.${total}`;
+            alert(cartItems);
+            askForPhoneNumber(total); // Pass total to the phone number function
+        }
+
+        function askForPhoneNumber(total) {
+            const phoneNumber = prompt("Please enter your phone number for payment:");
+            if (phoneNumber) {
+                alert(`Phone number ${phoneNumber} received! Proceeding to payment...`);
+                processPayment(total); // Proceed to payment processing
+            } else {
+                alert("Phone number is required to proceed with payment.");
+            }
+        }
+
+        function processPayment(total) {
+            while (true) {
+                const payment = parseFloat(prompt(`Enter your payment amount (Total: Ksh.${total}):`));
+                
+                if (isNaN(payment)) {
+                    alert("Invalid input. Please enter a numeric value.");
+                    continue; // Ask again
+                }
+                
+                if (payment < total) {
+                    alert("Payment failed: Insufficient amount. Please try again.");
+                } else {
+                    alert("Payment successful! Thank you for your purchase.");
+                    recordTransaction(total); // Record the transaction
+                    cart = []; // Clear the cart after successful payment
+                    break; // Exit the loop on success
+                }
+            }
+        }
+
+        function recordTransaction(amount) {
+            const transaction = {
+                amount: amount,
+                date: new Date().toLocaleString(),
+                status: "Completed"
+            };
+            transactions[loggedInUser].push(transaction); // Store transaction in user's history
+            alert(`Your account has been updated. Transaction of Ksh.${amount} has been recorded.`);
+            console.log(transactions); // For debugging
+        }
+
+        function promptLoginOrRegister() {
+            let action = prompt("Do you want to register or log in? (type 'register' or 'login')");
+            if (action === 'register') {
+                register();
+            } else if (action === 'login') {
+                login();
+            } else {
+                alert("Invalid option. Please try again.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="data:image/jpeg;base64,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" alt="logo">
+            </div>
+            <nav class="navbar">
+                <ul>
+                    <a href="home.html">Home</a>
+                    <a href="product.html">Products</a>
+                    <a href="about.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="products-container">
+            <h1>Our Products</h1>
+            <div class="product-grid">
+                <!-- Product 1 -->
+                <div class="product-item">
+                    <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRHXReagT5C1t88MtoVz3W_OaRePl2pqx0fci-mOPXqALZ2zqRIOOZv8PBONOs7O0vV5BZYVWOTswd86bK13dWvzgciZqQsEYfdV3rDWHbjrmFwn4BGEJ-SOGLeYU_ycOB9tEsdQiVSuKg&usqp=CAc" alt="HP Elite revolve">
+                    <h2>HP Elite Book revolve</h2>
+                    <p class="price">Ksh.20000</p>
+                    <p class="description">New model in the market and all colors.</p>
+                    <button onclick="addToCart('HP Envy 17', 20000)">Add to Cart</button>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="product-item">
+                    <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSD-UiTHUratL-lQ_-xf_CpiD5Y1GL5UpRX_aqgZCWB4RsZbCNXBa8rnlt910CTx5RfZwM0C_yTMW0KnbPuRdnIfDFVBNaXzS_YuqiAMANXGh_etiyjiP9WCyL-6l8FDoumLZ31WCgNIg&usqp=CAc" alt="HP Envy x360">
+                    <h2>HP Victus 16</h2>
+                    <p class="price">Ksh.54000</p>
+                    <p class="description">So durable  and different colors.</p>
+                    <button onclick="addToCart('HP Victus 16', 54000)">Add to Cart</button>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="product-item">
+                    <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTu6zbQx64NP5AI4avRRleEtFcMHRsDbV6ojvQi4dktwyXaWsTAGHdi-_Ic6QuTjEfi-igU_GaivgCXulHDXlcDBZcOG65nRmDB-WWGOWMGlcnac5BQcwphxrNzcmij3-n8NT7KeaU&usqp=CAc"HP Elite 840">
+                    <h2>Lenovo Legion 7</h2>
+                    <p class="price">Ksh.80000</p>
+                    <p class="description">Hard, leather, with tube.</p>
+                    <button onclick="addToCart('Lenovo Legion 7', 80000)"></button>
+                </div>
+
+                <!-- Additional products -->
+                <div class="product-item">
+                    <img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRh1EeUgajdy57wlIS60f_TZ7Gt9l8vHikVDp7WuiJrwwGWXxjpJJdaK7bdyni1JLKOravFJRKeaXQTJPtf8KfpHT4a1G_8BVlpahQS498PCGpLhKQBdhyoY-9MYkVxyj49A9UICUtdSw&usqp=CAc" alt="phantom">
+                    <h2>HP Elitebook 40</h2>
+                    <p class="price">Ksh.120000</p>
+                    <p class="description">Hard, leather material, so durable.</p>
+                    <button onclick="addToCart('HP Elitebook 40', 120000)">Add to Cart</button>
+                </div>
+                <div class="product-item">
+                    <img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTaHYdiEY3ifs52J6e0b0Zc6aQempUx3oqXBJn6GoEh0WZRYZ1BznyGkxmKoFSq2v8ve1yUpO62KJqY0dGvRG-bvqfl6mUuYstMe-GQFtQPFOc_L_CAXALUfvK0dgoidcT9kkbCQ9nNZw&usqp=CAc" alt="mercurials">
+                    <h2>HP Pavilion Aero 13AMD</h2>
+                    <p class="price">Ksh.20000</p>
+                    <p class="description">Light weight, soft surface, cotton made.</p>
+                    <button onclick="addToCart('HP Pavilion Aero 13 AMD', 20000)">Add to Cart</button>
+                </div>
+                <div class="product-item">
+                    <img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTX9WnAVHyH9NFHoAPDEchemL6s6buJDQbS67NmDEHCzQhJtFNj6WHNlxs3huT_GTttLJ6LSQCUEj6D2qzi7e60avEVc1YjQD3Zz2HUMPf3bFL4JsaUwudPvMKoJwrAZgUxZvJ1a7rQEZU&usqp=CAc" alt="bib">
+                    <h2>HP Spectre x360</h2>
+                    <p class="price">Ksh.75000</p>
+                    <p class="description">All colors available, flexible.</p>
+                    <button onclick="addToCart('HP Spectre x360', 75000)">Add to Cart</button>
+                </div>
+                <div class="product-item">
+                    <img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTH9yuKSbhLPaVQUHVvUqoHho4KftfaV2zLmOlOLWwo7ztmDeQR2MsRwR0DwSUa0VtqJmHJ79mL99HNS8eLWdNoXuF_2qYLUpxD364RIvjWc3txb6_AaYG2qV2H5EE4MWjD8pVmKAQKFKA&usqp=CAc" alt="cones6">
+                    <h2>HP Elitebook 830 G5</h2>
+                    <p class="price">Ksh.85000</p>
+                    <p class="description">Strong and all colors and types available.</p>
+                    <button onclick="addToCart('HP Elitebook 830 G5', 85000)">Add to Cart</button>
+                </div>
+                <div class="product-item">
+                    <img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQgbIjy2hV5E7lfZCw9xEfy3LX6DUpE7XzKJdkUBccC9PtYXLUsPN7HyWuKdtvPpjGq_PRqgpvEqTVIhuAE53bO15oGsTOS4d0hRg_AU6RC6PHFYtsjPZYu6AagR9mbiCYf2nYp7wm5Zw&usqp=CAc" alt="HP Pavilion plus">
+                    <h2>HP Victus gaming laptop</h2>
+                    <p class="price">Ksh.60000</p>
+                    <p class="description">All colors available, flexible.</p>
+                    <button onclick="addToCart('HP Victus gaming laptop', 60000)">Add to Cart</button>
+                </div>
+            </div>
+            <button onclick="viewCart()">View Cart</button>
+            <button onclick="promptLoginOrRegister()">Register/Login</button>
+        </div>
+    </main>
+</body>
+</html>
